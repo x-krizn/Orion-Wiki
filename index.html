@@ -1,0 +1,490 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>PROJECT ORION — Internal Documentation</title>
+  <meta name="description" content="Project Orion internal design documentation">
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>⚙</text></svg>">
+
+  <!-- Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Share+Tech+Mono&family=Barlow:wght@300;400;600&family=Barlow+Condensed:wght@600;700&display=swap" rel="stylesheet">
+
+  <!-- Docsify theme base (minimal, we override everything) -->
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/docsify@4/lib/themes/vue.css">
+
+  <style>
+    /* ── TOKENS ─────────────────────────────────────────────── */
+    :root {
+      --bg:          #0e0e0f;
+      --bg-surface:  #151618;
+      --bg-raised:   #1c1d20;
+      --border:      #2a2c30;
+      --border-lit:  #3d4048;
+      --text:        #c8cad0;
+      --text-dim:    #6b6f78;
+      --text-bright: #e8eaf0;
+      --amber:       #e8a030;
+      --amber-dim:   #7a5018;
+      --amber-glow:  rgba(232,160,48,0.08);
+      --red:         #c04840;
+      --green:       #4a8860;
+      --blue:        #4878a8;
+      --mono:        'Share Tech Mono', monospace;
+      --sans:        'Barlow', sans-serif;
+      --head:        'Barlow Condensed', sans-serif;
+      --sidebar-w:   280px;
+    }
+
+    /* ── RESET ──────────────────────────────────────────────── */
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      background: var(--bg);
+      color: var(--text);
+      font-family: var(--sans);
+      font-weight: 300;
+      line-height: 1.7;
+    }
+
+    /* ── SIDEBAR ────────────────────────────────────────────── */
+    .sidebar {
+      background: var(--bg-surface) !important;
+      border-right: 1px solid var(--border) !important;
+      width: var(--sidebar-w) !important;
+      padding: 0 !important;
+    }
+
+    .sidebar-nav {
+      padding: 0 0 2rem 0;
+    }
+
+    /* Logo / title block */
+    .sidebar::before {
+      content: 'PROJECT ORION';
+      display: block;
+      font-family: var(--head);
+      font-size: 0.7rem;
+      font-weight: 700;
+      letter-spacing: 0.25em;
+      color: var(--amber);
+      padding: 1.5rem 1.25rem 0.25rem;
+      border-bottom: 1px solid var(--border);
+      margin-bottom: 1rem;
+    }
+
+    .sidebar-nav ul {
+      list-style: none;
+      padding: 0;
+    }
+
+    .sidebar-nav > ul {
+      padding: 0 0.75rem;
+    }
+
+    /* Section labels (bold items in _sidebar.md) */
+    .sidebar-nav ul li > p,
+    .sidebar-nav ul li > strong {
+      display: block;
+      font-family: var(--head);
+      font-size: 0.65rem;
+      font-weight: 700;
+      letter-spacing: 0.18em;
+      color: var(--text-dim);
+      text-transform: uppercase;
+      padding: 1rem 0.5rem 0.25rem;
+    }
+
+    .sidebar-nav ul li a {
+      display: block;
+      font-family: var(--mono);
+      font-size: 0.75rem;
+      color: var(--text) !important;
+      text-decoration: none !important;
+      padding: 0.3rem 0.75rem;
+      border-left: 2px solid transparent;
+      transition: all 0.15s ease;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+
+    .sidebar-nav ul li a:hover {
+      color: var(--amber) !important;
+      border-left-color: var(--amber-dim);
+      background: var(--amber-glow);
+    }
+
+    .sidebar-nav ul li.active > a {
+      color: var(--amber) !important;
+      border-left-color: var(--amber);
+      background: var(--amber-glow);
+    }
+
+    /* Search */
+    .search {
+      padding: 0.75rem 1rem !important;
+      border-bottom: 1px solid var(--border) !important;
+      margin-bottom: 0.5rem !important;
+    }
+
+    .search input {
+      background: var(--bg-raised) !important;
+      border: 1px solid var(--border) !important;
+      border-radius: 2px !important;
+      color: var(--text) !important;
+      font-family: var(--mono) !important;
+      font-size: 0.75rem !important;
+      padding: 0.4rem 0.6rem !important;
+      width: 100% !important;
+      outline: none !important;
+    }
+
+    .search input:focus {
+      border-color: var(--amber) !important;
+    }
+
+    .search input::placeholder {
+      color: var(--text-dim) !important;
+    }
+
+    /* ── MAIN CONTENT ───────────────────────────────────────── */
+    .content {
+      left: var(--sidebar-w) !important;
+    }
+
+    .markdown-section {
+      max-width: 860px !important;
+      padding: 3rem 3rem 6rem !important;
+      color: var(--text) !important;
+    }
+
+    /* ── TYPOGRAPHY ─────────────────────────────────────────── */
+    .markdown-section h1 {
+      font-family: var(--head);
+      font-size: 1.6rem;
+      font-weight: 700;
+      letter-spacing: 0.06em;
+      color: var(--text-bright);
+      border-bottom: 1px solid var(--border);
+      padding-bottom: 0.75rem;
+      margin: 0 0 0.25rem;
+      text-transform: uppercase;
+    }
+
+    .markdown-section h2 {
+      font-family: var(--head);
+      font-size: 1.1rem;
+      font-weight: 600;
+      letter-spacing: 0.08em;
+      color: var(--amber);
+      text-transform: uppercase;
+      border-bottom: 1px solid var(--border);
+      padding-bottom: 0.4rem;
+      margin: 2.5rem 0 1rem;
+    }
+
+    .markdown-section h3 {
+      font-family: var(--head);
+      font-size: 0.9rem;
+      font-weight: 600;
+      letter-spacing: 0.06em;
+      color: var(--text-bright);
+      text-transform: uppercase;
+      margin: 1.75rem 0 0.75rem;
+    }
+
+    .markdown-section h4 {
+      font-family: var(--mono);
+      font-size: 0.8rem;
+      color: var(--text-dim);
+      letter-spacing: 0.04em;
+      margin: 1.5rem 0 0.5rem;
+    }
+
+    /* Subtitle line (### lines after h1) */
+    .markdown-section h1 + h3 {
+      font-family: var(--sans);
+      font-size: 0.8rem;
+      font-weight: 300;
+      letter-spacing: 0.04em;
+      color: var(--text-dim);
+      text-transform: none;
+      margin: 0.25rem 0 1.5rem;
+      border: none;
+    }
+
+    .markdown-section p {
+      margin: 0 0 1rem;
+      font-size: 0.9rem;
+    }
+
+    .markdown-section em {
+      color: var(--text-dim);
+      font-style: normal;
+      font-size: 0.82rem;
+    }
+
+    .markdown-section strong {
+      color: var(--text-bright);
+      font-weight: 600;
+    }
+
+    /* ── STATUS LABELS ──────────────────────────────────────── */
+    /* Italic paragraphs that are status labels */
+    .markdown-section p > em:only-child,
+    .markdown-section em:only-child {
+      display: inline-block;
+      font-family: var(--mono);
+      font-size: 0.65rem;
+      letter-spacing: 0.12em;
+      padding: 0.15rem 0.5rem;
+      border-radius: 1px;
+      border: 1px solid transparent;
+    }
+
+    /* LOCKED — amber */
+    .markdown-section p em:only-child[title="LOCKED"],
+    .markdown-section em:only-child {
+      color: var(--text-dim);
+      border-color: var(--border);
+      background: var(--bg-raised);
+    }
+
+    /* ── CODE ───────────────────────────────────────────────── */
+    .markdown-section code {
+      font-family: var(--mono) !important;
+      font-size: 0.8rem !important;
+      background: var(--bg-raised) !important;
+      color: var(--amber) !important;
+      padding: 0.1em 0.35em !important;
+      border-radius: 2px !important;
+      border: 1px solid var(--border) !important;
+    }
+
+    .markdown-section pre {
+      background: var(--bg-raised) !important;
+      border: 1px solid var(--border) !important;
+      border-left: 3px solid var(--amber-dim) !important;
+      border-radius: 2px !important;
+      padding: 1.25rem 1.5rem !important;
+      margin: 0.75rem 0 1.25rem !important;
+      overflow-x: auto !important;
+    }
+
+    .markdown-section pre code {
+      background: transparent !important;
+      border: none !important;
+      color: var(--text) !important;
+      font-size: 0.78rem !important;
+      padding: 0 !important;
+      line-height: 1.6 !important;
+    }
+
+    /* ── TABLES ─────────────────────────────────────────────── */
+    .markdown-section table {
+      width: 100%;
+      border-collapse: collapse;
+      font-family: var(--mono);
+      font-size: 0.76rem;
+      margin: 0.75rem 0 1.5rem;
+    }
+
+    .markdown-section thead th {
+      background: var(--bg-raised);
+      color: var(--amber);
+      font-family: var(--head);
+      font-size: 0.65rem;
+      font-weight: 700;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+      text-align: left;
+      padding: 0.5rem 0.75rem;
+      border-bottom: 1px solid var(--amber-dim);
+      border-top: 1px solid var(--border);
+    }
+
+    .markdown-section tbody tr {
+      border-bottom: 1px solid var(--border);
+      transition: background 0.1s;
+    }
+
+    .markdown-section tbody tr:hover {
+      background: var(--bg-raised);
+    }
+
+    .markdown-section tbody td {
+      padding: 0.45rem 0.75rem;
+      color: var(--text);
+      vertical-align: top;
+    }
+
+    .markdown-section tbody td:first-child {
+      color: var(--text-bright);
+    }
+
+    /* ── BLOCKQUOTE ─────────────────────────────────────────── */
+    .markdown-section blockquote {
+      border-left: 3px solid var(--amber-dim) !important;
+      background: var(--bg-raised) !important;
+      padding: 0.75rem 1.25rem !important;
+      margin: 0.75rem 0 1.25rem !important;
+      font-style: italic;
+      color: var(--text-dim) !important;
+    }
+
+    .markdown-section blockquote p {
+      margin: 0;
+      font-size: 0.88rem;
+    }
+
+    /* ── HORIZONTAL RULE ────────────────────────────────────── */
+    .markdown-section hr {
+      border: none;
+      border-top: 1px solid var(--border);
+      margin: 2rem 0;
+    }
+
+    /* ── LINKS ──────────────────────────────────────────────── */
+    .markdown-section a {
+      color: var(--amber) !important;
+      text-decoration: none !important;
+      border-bottom: 1px solid var(--amber-dim);
+      transition: border-color 0.15s;
+    }
+
+    .markdown-section a:hover {
+      border-bottom-color: var(--amber);
+    }
+
+    /* ── LISTS ──────────────────────────────────────────────── */
+    .markdown-section ul,
+    .markdown-section ol {
+      padding-left: 1.5rem;
+      margin: 0.5rem 0 1rem;
+    }
+
+    .markdown-section li {
+      font-size: 0.9rem;
+      margin-bottom: 0.25rem;
+    }
+
+    /* ── ALERTS / CALLOUTS ──────────────────────────────────── */
+    .markdown-section .tip,
+    .markdown-section .warn,
+    .markdown-section .danger {
+      border-left: 3px solid;
+      padding: 0.75rem 1rem;
+      margin: 1rem 0;
+      font-size: 0.85rem;
+    }
+
+    /* ── COVER PAGE ─────────────────────────────────────────── */
+    section.cover {
+      background: var(--bg) !important;
+    }
+
+    section.cover .cover-main {
+      color: var(--text) !important;
+    }
+
+    section.cover h1 {
+      font-family: var(--head) !important;
+      color: var(--amber) !important;
+      font-size: 2.5rem !important;
+      letter-spacing: 0.12em !important;
+    }
+
+    /* ── SCROLLBAR ──────────────────────────────────────────── */
+    ::-webkit-scrollbar { width: 6px; height: 6px; }
+    ::-webkit-scrollbar-track { background: var(--bg); }
+    ::-webkit-scrollbar-thumb { background: var(--border-lit); border-radius: 3px; }
+    ::-webkit-scrollbar-thumb:hover { background: var(--amber-dim); }
+
+    /* ── VERSION BADGE ──────────────────────────────────────── */
+    .markdown-section em + em {
+      display: inline;
+    }
+
+    /* Footer text */
+    .markdown-section p:last-child em {
+      font-size: 0.72rem;
+      color: var(--text-dim);
+    }
+
+    /* ── MOBILE ─────────────────────────────────────────────── */
+    @media (max-width: 768px) {
+      :root { --sidebar-w: 250px; }
+
+      .markdown-section {
+        padding: 1.5rem 1.25rem 4rem !important;
+      }
+
+      .markdown-section table {
+        font-size: 0.68rem;
+      }
+
+      .markdown-section pre {
+        padding: 0.75rem 1rem !important;
+      }
+    }
+
+    /* ── TOGGLE BUTTON (mobile sidebar) ────────────────────── */
+    .sidebar-toggle {
+      background: var(--bg-surface) !important;
+      border-right: 1px solid var(--border) !important;
+      border-bottom: 1px solid var(--border) !important;
+    }
+
+    .sidebar-toggle span {
+      background: var(--amber) !important;
+    }
+  </style>
+</head>
+<body>
+  <div id="app">
+    <div style="
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      height: 100vh;
+      font-family: 'Share Tech Mono', monospace;
+      color: #6b6f78;
+      font-size: 0.8rem;
+      letter-spacing: 0.1em;
+    ">
+      LOADING DOCUMENTATION...
+    </div>
+  </div>
+
+  <script>
+    window.$docsify = {
+      name: 'PROJECT ORION',
+      repo: '',
+      loadSidebar: true,
+      loadNavbar: false,
+      subMaxLevel: 2,
+      auto2top: true,
+      homepage: 'README.md',
+      notFoundPage: true,
+      search: {
+        maxAge: 86400000,
+        paths: 'auto',
+        placeholder: 'SEARCH DOCUMENTATION',
+        noData: 'NO RESULTS',
+        depth: 3,
+        hideOtherSidebarContent: false,
+      },
+      plugins: [],
+    }
+  </script>
+
+  <!-- Docsify core -->
+  <script src="https://cdn.jsdelivr.net/npm/docsify@4/lib/docsify.min.js"></script>
+  <!-- Search plugin -->
+  <script src="https://cdn.jsdelivr.net/npm/docsify@4/lib/plugins/search.min.js"></script>
+  <!-- Zoom image -->
+  <script src="https://cdn.jsdelivr.net/npm/docsify@4/lib/plugins/zoom-image.min.js"></script>
+</body>
+</html>
