@@ -21,6 +21,7 @@
 
 - [M00 — The Bog](bog-v2.md)
 - [Camelot Border Town](border-town-v1.md)
+- [Camelot Outskirts](camelot-outskirts-v1.md)
 
 **GAME STRUCTURE**
 
