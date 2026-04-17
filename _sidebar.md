@@ -15,6 +15,7 @@
 **LOADOUTS & EQUIPMENT**
 
 - [Armory I — Warrior / Marauder / Guardian](armory.md)
+- [Marauder Class](marauder-v1.md)
 - [Armory II — Rogue / Wizard / Cleric](armory-ii.md)
 
 **ZONE DOCUMENTATION**
