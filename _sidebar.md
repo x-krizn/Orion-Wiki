@@ -5,6 +5,7 @@
 - [Codex](codex.md)
 - [World Registry](worlds.md)
 - [Map Architecture](mapping-v0.md)
+- [Gameworld Design](worlds-v1.md)
 
 **COMBAT SYSTEMS**
 
