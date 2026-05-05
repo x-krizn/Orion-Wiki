@@ -1,0 +1,1307 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover, user-scalable=no">
+<title>ISO-SPRITE</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Share+Tech+Mono&family=Rajdhani:wght@600;700&display=swap" rel="stylesheet">
+<style>
+:root {
+  --bg:         #0a0a0a;
+  --panel:      #111;
+  --card:       #161616;
+  --border:     #242424;
+  --amber:      #f59e0b;
+  --amber-dim:  #78490a;
+  --amber-glow: rgba(245,158,11,0.10);
+  --text:       #dedede;
+  --dim:        #555;
+  --danger:     #ef4444;
+  --green:      #22c55e;
+  --blue:       #3b82f6;
+  --mono:       'Share Tech Mono', monospace;
+  --disp:       'Rajdhani', sans-serif;
+  --safe-b:     env(safe-area-inset-bottom, 0px);
+}
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+html,body{height:100%;background:var(--bg);color:var(--text);font-family:var(--mono);font-size:13px;overscroll-behavior:none}
+body{display:flex;flex-direction:column;height:100dvh}
+
+/* HEADER */
+header{background:var(--panel);border-bottom:1px solid var(--amber);padding:10px 14px 9px;display:flex;align-items:center;justify-content:space-between;flex-shrink:0}
+.logo{font-family:var(--disp);font-size:20px;font-weight:700;color:var(--amber);letter-spacing:4px}
+.logo-sub{font-size:9px;color:var(--dim);letter-spacing:2.5px;margin-top:1px}
+.status{display:flex;align-items:center;gap:7px}
+.dot{width:8px;height:8px;border-radius:50%;background:var(--dim);flex-shrink:0}
+.dot.ready{background:var(--green)}
+.dot.busy{background:var(--amber);animation:blink .6s infinite}
+@keyframes blink{0%,100%{opacity:1}50%{opacity:.2}}
+.status-txt{font-size:10px;color:var(--dim);letter-spacing:1px;max-width:150px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+
+/* TABS */
+.tab-bar{display:flex;background:var(--panel);border-bottom:1px solid var(--border);flex-shrink:0}
+.tab{flex:1;padding:10px 2px;text-align:center;font-size:10px;letter-spacing:1px;color:var(--dim);cursor:pointer;border-bottom:2px solid transparent;-webkit-tap-highlight-color:transparent;user-select:none}
+.tab.active{color:var(--amber);border-color:var(--amber)}
+
+/* PAGES */
+.pages{flex:1;overflow:hidden;position:relative}
+.page{position:absolute;inset:0;overflow-y:auto;display:none;flex-direction:column}
+.page.active{display:flex}
+
+/* FORMS */
+.sgroup{border-bottom:1px solid var(--border);padding:14px 16px}
+.slabel{font-size:10px;letter-spacing:2.5px;color:var(--amber);margin-bottom:12px;text-transform:uppercase}
+.v2-badge{color:var(--dim);font-size:9px;letter-spacing:1px;margin-left:6px}
+.sfield{margin-bottom:12px}.sfield:last-child{margin-bottom:0}
+.sfield label{display:block;font-size:10px;color:var(--dim);letter-spacing:1px;margin-bottom:6px}
+.sfield input,.sfield select{width:100%;background:var(--bg);border:1px solid var(--border);color:var(--text);font-family:var(--mono);font-size:14px;padding:10px 12px;outline:none;-webkit-appearance:none;appearance:none;border-radius:0}
+.sfield input:focus,.sfield select:focus{border-color:var(--amber)}
+.sfield select{background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='6' viewBox='0 0 10 6'%3E%3Cpath d='M0 0l5 6 5-6z' fill='%23555'/%3E%3C/svg%3E");background-repeat:no-repeat;background-position:right 12px center;padding-right:32px}
+.sfield select option{background:#1a1a1a}
+.row2{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+
+/* SLIDERS */
+.slider-row{display:flex;align-items:center;gap:10px;margin-bottom:10px}
+.slider-row:last-child{margin-bottom:0}
+.slider-lbl{font-size:10px;color:var(--dim);min-width:90px;letter-spacing:1px}
+.slider-val{font-size:11px;color:var(--amber);min-width:38px;text-align:right}
+input[type=range]{flex:1;-webkit-appearance:none;appearance:none;height:2px;background:var(--border);outline:none}
+input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:20px;height:20px;border-radius:50%;background:var(--amber);cursor:pointer}
+
+/* TOGGLES */
+.toggle-row{display:flex;align-items:center;justify-content:space-between;margin-bottom:10px}
+.toggle-row:last-child{margin-bottom:0}
+.toggle-lbl{font-size:11px;color:var(--text);letter-spacing:1px}
+.toggle{width:42px;height:24px;background:var(--border);border-radius:12px;position:relative;cursor:pointer;flex-shrink:0;transition:background .2s;-webkit-tap-highlight-color:transparent}
+.toggle.on{background:var(--amber)}
+.toggle::after{content:'';position:absolute;top:4px;left:4px;width:16px;height:16px;border-radius:50%;background:#000;transition:left .2s}
+.toggle.on::after{left:22px}
+.sub-controls{padding-left:4px;margin-top:6px;transition:opacity .2s}
+.sub-controls.off{opacity:.3;pointer-events:none}
+
+/* INFO CARDS */
+.info-grid{display:none;grid-template-columns:1fr 1fr;gap:8px;margin:16px}
+.info-grid.visible{display:grid}
+.info-card{background:var(--card);border:1px solid var(--border);padding:10px 12px}
+.info-card .k{font-size:9px;color:var(--dim);letter-spacing:1.5px}
+.info-card .v{font-size:16px;color:var(--amber);font-family:var(--disp);font-weight:600}
+
+/* DATA ROWS */
+.dr{display:flex;justify-content:space-between;background:var(--card);padding:9px 12px;font-size:12px;border-bottom:1px solid var(--border)}
+.dr .k{color:var(--dim)}.dr .v{color:var(--text)}.dr .v.hi{color:var(--amber)}.dr .v.ok{color:var(--green)}.dr .v.bad{color:var(--danger)}
+
+/* LOAD PAGE */
+.load-cta{margin:24px 16px 0;background:var(--amber-glow);border:2px solid var(--amber);padding:28px 20px;display:flex;flex-direction:column;align-items:center;gap:10px;cursor:pointer;-webkit-tap-highlight-color:transparent}
+.load-cta:active{opacity:.7}
+.load-cta.sec{margin-top:12px;background:none;border-color:var(--border);padding:18px 20px}
+.load-glyph{font-size:36px;color:var(--amber-dim)}
+.load-title{font-family:var(--disp);font-size:20px;font-weight:700;color:var(--amber);letter-spacing:4px}
+.load-sub{font-size:11px;color:var(--dim);letter-spacing:1.5px;text-align:center;line-height:1.8}
+.load-cta.sec .load-title{font-size:16px;color:var(--dim)}
+
+/* RENDER PAGE */
+#babylonCanvas{width:100%;aspect-ratio:1/1;max-height:44vh;display:block;background:#050505;flex-shrink:0;touch-action:none}
+.render-settings{flex:1;overflow-y:auto;-webkit-overflow-scrolling:touch}
+
+/* PROGRESS */
+.progress-wrap{background:var(--border);height:3px;display:none;flex-shrink:0}
+.progress-wrap.visible{display:block}
+.progress-bar{height:100%;background:var(--amber);width:0%;transition:width .15s}
+
+/* PIVOT PAGE */
+.pivot-page{overflow:hidden}
+.pivot-toolbar{background:var(--panel);border-bottom:1px solid var(--border);padding:8px 12px;display:flex;align-items:center;gap:8px;flex-shrink:0}
+.tbtn{background:none;border:1px solid var(--border);color:var(--dim);font-family:var(--mono);font-size:11px;padding:7px 14px;cursor:pointer;-webkit-tap-highlight-color:transparent}
+.tbtn.on{border-color:var(--amber);color:var(--amber)}
+.tbtn:active{opacity:.6}
+.zoom-lbl{font-size:11px;color:var(--dim);min-width:42px}
+.pivot-coord{font-size:10px;color:var(--dim);margin-left:auto;letter-spacing:1px}
+.canvas-scroll{flex:1;overflow:auto;-webkit-overflow-scrolling:touch;background:repeating-conic-gradient(#181818 0% 25%,#111 0% 50%) 0 0/10px 10px;position:relative}
+#pivotCanvas{display:block;image-rendering:pixelated;image-rendering:crisp-edges;touch-action:none}
+.pivot-hint{position:absolute;bottom:16px;left:0;right:0;text-align:center;pointer-events:none}
+.pivot-hint span{background:rgba(10,10,10,.88);border:1px solid var(--amber-dim);color:var(--amber);font-size:11px;letter-spacing:2px;padding:6px 16px}
+
+/* PREVIEW PAGE */
+.prev-frame-wrap{margin:16px;background:repeating-conic-gradient(#181818 0% 25%,#111 0% 50%) 0 0/10px 10px;display:flex;align-items:center;justify-content:center;min-height:220px}
+#previewCanvas{image-rendering:pixelated;image-rendering:crisp-edges;max-width:100%;max-height:280px}
+.prev-nav{display:flex;align-items:stretch;margin:0 16px}
+.prev-nav button{flex:1;background:var(--card);border:1px solid var(--border);color:var(--dim);font-family:var(--mono);font-size:20px;padding:13px 0;cursor:pointer;-webkit-tap-highlight-color:transparent}
+.prev-nav button:active{background:var(--amber-glow);color:var(--amber)}
+.frame-lbl{flex:2;text-align:center;font-family:var(--disp);font-size:18px;font-weight:600;color:var(--amber);border-top:1px solid var(--border);border-bottom:1px solid var(--border);padding:13px 0;letter-spacing:2px}
+.prev-data{margin:16px 16px 0;display:flex;flex-direction:column;gap:1px}
+
+/* EXPORT PAGE */
+.export-page{padding:0 0 20px}
+.ghost-btn{background:none;border:1px dashed var(--border);color:var(--dim);font-family:var(--mono);font-size:11px;padding:12px;width:100%;cursor:pointer;letter-spacing:2px;margin-top:10px;-webkit-tap-highlight-color:transparent}
+.ghost-btn:active{border-color:var(--amber);color:var(--amber)}
+
+/* FACING TAGS */
+.facing-tags{display:flex;flex-wrap:wrap;gap:4px;margin-top:8px}
+.facing-tag{background:var(--bg);border:1px solid var(--border);color:var(--dim);font-size:10px;padding:3px 7px;letter-spacing:1px}
+
+/* FOOTER */
+footer{background:var(--panel);border-top:1px solid var(--amber);padding:10px 14px;padding-bottom:calc(10px + var(--safe-b));display:flex;flex-direction:column;gap:6px;flex-shrink:0}
+.primary-btn{background:var(--amber);border:none;color:#000;font-family:var(--disp);font-size:17px;font-weight:700;letter-spacing:4px;padding:13px;cursor:pointer;width:100%;-webkit-tap-highlight-color:transparent;display:none}
+.primary-btn.visible{display:block}
+.primary-btn:disabled{background:var(--border);color:var(--dim)}
+.primary-btn:not(:disabled):active{background:#fbbf24}
+.foot-msg{font-size:10px;color:var(--dim);text-align:center;letter-spacing:1px;min-height:14px}
+.foot-msg.err{color:var(--danger)}.foot-msg.ok{color:var(--green)}
+
+input[type="file"]{display:none}
+::-webkit-scrollbar{display:none}
+</style>
+</head>
+<body>
+
+<header>
+  <div>
+    <div class="logo">ISO-SPRITE</div>
+    <div class="logo-sub">SPRITE BOX &nbsp;·&nbsp; .JAGER v3</div>
+  </div>
+  <div class="status">
+    <div class="dot" id="statusDot"></div>
+    <div class="status-txt" id="statusTxt">NO MODEL</div>
+  </div>
+</header>
+
+<div class="tab-bar">
+  <div class="tab active" data-tab="load"    onclick="showTab('load')">LOAD</div>
+  <div class="tab"        data-tab="render"  onclick="showTab('render')">RENDER</div>
+  <div class="tab"        data-tab="pivot"   onclick="showTab('pivot')">PIVOT</div>
+  <div class="tab"        data-tab="preview" onclick="showTab('preview')">PREVIEW</div>
+  <div class="tab"        data-tab="export"  onclick="showTab('export')">EXPORT</div>
+</div>
+
+<div class="pages">
+
+<!-- ── LOAD ──────────────────────────────────────── -->
+<div class="page active" id="page-load">
+  <div class="load-cta" onclick="triggerGlb()">
+    <div class="load-glyph">⬡</div>
+    <div class="load-title">LOAD MODEL</div>
+    <div class="load-sub">TAP TO BROWSE<br>GLB / GLTF</div>
+  </div>
+  <div class="load-cta sec" onclick="triggerJager()">
+    <div class="load-title">OPEN .JAGER</div>
+    <div class="load-sub">RESTORE SETTINGS + RE-RENDER</div>
+  </div>
+
+  <div class="info-grid" id="infoGrid">
+    <div class="info-card"><div class="k">COMPONENT</div><div class="v" id="iComp">—</div></div>
+    <div class="info-card"><div class="k">ANIMATIONS</div><div class="v" id="iAnims">—</div></div>
+    <div class="info-card"><div class="k">MESHES</div><div class="v" id="iMeshes">—</div></div>
+    <div class="info-card"><div class="k">SOCKETS</div><div class="v" id="iSockets">—</div></div>
+  </div>
+
+  <div class="sgroup" id="loadSettings" style="display:none">
+    <div class="slabel">Component</div>
+    <div class="sfield">
+      <label>SLOT</label>
+      <select id="componentSlot" onchange="onSlotChange()">
+        <option value="legs">legs</option>
+        <option value="torso">torso</option>
+        <option value="left_arm">left_arm</option>
+        <option value="right_arm">right_arm</option>
+        <option value="head" selected>head</option>
+        <option value="weapon_main">weapon_main</option>
+        <option value="weapon_aux">weapon_aux</option>
+        <option value="custom">custom…</option>
+      </select>
+    </div>
+    <div class="sfield" id="customWrap" style="display:none">
+      <label>CUSTOM IDENTIFIER</label>
+      <input type="text" id="customName" placeholder="component_id">
+    </div>
+    <div class="sfield">
+      <label>DRAW LAYER</label>
+      <input type="number" id="drawLayer" value="5" min="0" max="99">
+    </div>
+  </div>
+</div>
+
+<!-- ── RENDER ─────────────────────────────────────── -->
+<div class="page" id="page-render" style="overflow:hidden">
+  <canvas id="babylonCanvas"></canvas>
+  <div class="progress-wrap" id="progressWrap"><div class="progress-bar" id="progressBar"></div></div>
+  <div class="render-settings">
+
+    <div class="sgroup">
+      <div class="slabel">Capture</div>
+      <div class="row2">
+        <div class="sfield">
+          <label>RESOLUTION</label>
+          <select id="resolution">
+            <option value="64">64 px</option>
+            <option value="128">128 px</option>
+            <option value="256" selected>256 px</option>
+            <option value="512">512 px</option>
+          </select>
+        </div>
+        <div class="sfield">
+          <label>FACINGS</label>
+          <input type="number" id="facingCount" value="8" min="1" max="64" oninput="updateFacingTags()">
+        </div>
+      </div>
+      <div class="sfield">
+        <label>FACING ORDER — comma-separated, left to right</label>
+        <input type="text" id="facingOrder" value="SW,S,SE,E,NE,N,NW,W" oninput="updateFacingTags()">
+      </div>
+      <div class="facing-tags" id="facingTags"></div>
+    </div>
+
+    <div class="sgroup">
+      <div class="slabel">Animation <span class="v2-badge">(V2)</span></div>
+      <div class="sfield">
+        <label>ANIMATION GROUP</label>
+        <select id="animSelect"><option value="">none — static render</option></select>
+      </div>
+      <div class="row2">
+        <div class="sfield"><label>FPS</label><input type="number" id="captureFps" value="12" min="1" max="60"></div>
+        <div class="sfield"><label>MAX DURATION (s)</label><input type="number" id="captureDur" value="2" min="0.1" max="60" step="0.1"></div>
+      </div>
+    </div>
+
+    <div class="sgroup">
+      <div class="slabel">Lighting</div>
+      <div class="slider-row">
+        <span class="slider-lbl">AMBIENT</span>
+        <input type="range" id="sAmbient" min="0" max="2" step="0.05" value="0.3" oninput="onLightChange(this,'ambient')">
+        <span class="slider-val" id="vAmbient">0.30</span>
+      </div>
+      <div class="slider-row">
+        <span class="slider-lbl">KEY INTENSITY</span>
+        <input type="range" id="sKeyInt" min="0" max="3" step="0.05" value="1.2" oninput="onLightChange(this,'keyInt')">
+        <span class="slider-val" id="vKeyInt">1.20</span>
+      </div>
+      <div class="slider-row">
+        <span class="slider-lbl">KEY ELEVATION</span>
+        <input type="range" id="sKeyElev" min="0" max="90" step="1" value="60" oninput="onLightChange(this,'keyElev')">
+        <span class="slider-val" id="vKeyElev">60°</span>
+      </div>
+      <div class="slider-row">
+        <span class="slider-lbl">KEY AZIMUTH</span>
+        <input type="range" id="sKeyAz" min="0" max="360" step="1" value="45" oninput="onLightChange(this,'keyAz')">
+        <span class="slider-val" id="vKeyAz">45°</span>
+      </div>
+      <div class="toggle-row" style="margin-top:4px">
+        <span class="toggle-lbl">RIM LIGHT</span>
+        <div class="toggle on" id="tRim" onclick="toggleFx('rim')"></div>
+      </div>
+      <div class="sub-controls" id="rimSub">
+        <div class="slider-row">
+          <span class="slider-lbl">RIM INTENSITY</span>
+          <input type="range" id="sRimInt" min="0" max="2" step="0.05" value="0.4" oninput="onLightChange(this,'rimInt')">
+          <span class="slider-val" id="vRimInt">0.40</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="sgroup">
+      <div class="slabel">Post-Process</div>
+
+      <div class="toggle-row">
+        <span class="toggle-lbl">BLOOM</span>
+        <div class="toggle" id="tBloom" onclick="toggleFx('bloom')"></div>
+      </div>
+      <div class="sub-controls off" id="bloomSub">
+        <div class="slider-row">
+          <span class="slider-lbl">THRESHOLD</span>
+          <input type="range" id="sBloomT" min="0" max="1" step="0.05" value="0.8" oninput="onPPChange(this,'bloomThreshold')">
+          <span class="slider-val" id="vBloomT">0.80</span>
+        </div>
+        <div class="slider-row">
+          <span class="slider-lbl">WEIGHT</span>
+          <input type="range" id="sBloomW" min="0" max="1" step="0.05" value="0.4" oninput="onPPChange(this,'bloomWeight')">
+          <span class="slider-val" id="vBloomW">0.40</span>
+        </div>
+      </div>
+
+      <div class="toggle-row" style="margin-top:10px">
+        <span class="toggle-lbl">GLOW <span style="color:var(--dim);font-size:9px">(emissive)</span></span>
+        <div class="toggle" id="tGlow" onclick="toggleFx('glow')"></div>
+      </div>
+      <div class="sub-controls off" id="glowSub">
+        <div class="slider-row">
+          <span class="slider-lbl">INTENSITY</span>
+          <input type="range" id="sGlowI" min="0" max="2" step="0.05" value="0.6" oninput="onPPChange(this,'glowIntensity')">
+          <span class="slider-val" id="vGlowI">0.60</span>
+        </div>
+      </div>
+
+      <div class="toggle-row" style="margin-top:10px">
+        <span class="toggle-lbl">SHARPEN</span>
+        <div class="toggle" id="tSharpen" onclick="toggleFx('sharpen')"></div>
+      </div>
+      <div class="sub-controls off" id="sharpenSub">
+        <div class="slider-row">
+          <span class="slider-lbl">AMOUNT</span>
+          <input type="range" id="sSharpen" min="0" max="1" step="0.05" value="0.3" oninput="onPPChange(this,'sharpenAmount')">
+          <span class="slider-val" id="vSharpen">0.30</span>
+        </div>
+      </div>
+
+      <div class="toggle-row" style="margin-top:10px">
+        <span class="toggle-lbl">VIGNETTE</span>
+        <div class="toggle" id="tVignette" onclick="toggleFx('vignette')"></div>
+      </div>
+      <div class="sub-controls off" id="vignetteSub">
+        <div class="slider-row">
+          <span class="slider-lbl">WEIGHT</span>
+          <input type="range" id="sVigW" min="0" max="10" step="0.5" value="5" oninput="onPPChange(this,'vignetteWeight')">
+          <span class="slider-val" id="vVigW">5.0</span>
+        </div>
+      </div>
+
+      <div class="toggle-row" style="margin-top:10px">
+        <span class="toggle-lbl">CHROMATIC ABERRATION</span>
+        <div class="toggle" id="tChroma" onclick="toggleFx('chroma')"></div>
+      </div>
+      <div class="sub-controls off" id="chromaSub">
+        <div class="slider-row">
+          <span class="slider-lbl">AMOUNT</span>
+          <input type="range" id="sChroma" min="0" max="5" step="0.1" value="1.0" oninput="onPPChange(this,'chromaAmount')">
+          <span class="slider-val" id="vChroma">1.0</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="sgroup">
+      <div class="slabel">Overlays <span class="v2-badge">(V2)</span></div>
+      <div style="font-size:11px;color:var(--dim);line-height:1.7">
+        Wear patterns, dirt, tint overlays.<br>
+        Available in the next version.
+      </div>
+    </div>
+
+  </div>
+</div>
+
+<!-- ── PIVOT ──────────────────────────────────────── -->
+<div class="page pivot-page" id="page-pivot">
+  <div class="pivot-toolbar">
+    <button class="tbtn" onclick="pzoomOut()">−</button>
+    <button class="tbtn" onclick="pzoomIn()">+</button>
+    <span class="zoom-lbl" id="pzoomLbl">—</span>
+    <button class="tbtn" onclick="pfitView()">FIT</button>
+    <button class="tbtn on" id="btnGrid" onclick="togglePGrid()">GRID</button>
+    <span class="pivot-coord" id="pivotCoord">—</span>
+  </div>
+  <div class="canvas-scroll" id="pivotScroll">
+    <canvas id="pivotCanvas"></canvas>
+    <div class="pivot-hint" id="pivotHint"><span>TAP TO SET PIVOT</span></div>
+  </div>
+</div>
+
+<!-- ── PREVIEW ────────────────────────────────────── -->
+<div class="page" id="page-preview" style="padding:0 0 20px">
+  <div class="prev-frame-wrap">
+    <canvas id="previewCanvas" width="300" height="300"></canvas>
+  </div>
+  <div class="prev-nav">
+    <button onclick="stepFrame(-1)">◂</button>
+    <div class="frame-lbl" id="frameLbl">—</div>
+    <button onclick="stepFrame(1)">▸</button>
+  </div>
+  <div class="prev-data" style="margin-top:16px">
+    <div class="dr"><span class="k">format</span><span class="v hi">jager v3</span></div>
+    <div class="dr"><span class="k">engine</span><span class="v">Spritebox</span></div>
+    <div class="dr"><span class="k">component</span><span class="v hi" id="pvComp">—</span></div>
+    <div class="dr"><span class="k">frame size</span><span class="v" id="pvSize">—</span></div>
+    <div class="dr"><span class="k">pivot</span><span class="v hi" id="pvPivot">not set</span></div>
+    <div class="dr"><span class="k">sockets detected</span><span class="v" id="pvSockets">—</span></div>
+    <div class="dr"><span class="k">est. file size</span><span class="v" id="pvFileSize">—</span></div>
+  </div>
+</div>
+
+<!-- ── EXPORT ─────────────────────────────────────── -->
+<div class="page export-page" id="page-export">
+  <div class="sgroup">
+    <div class="slabel">Summary</div>
+    <div class="dr"><span class="k">format</span><span class="v hi">jager v3</span></div>
+    <div class="dr"><span class="k">component</span><span class="v" id="exComp">—</span></div>
+    <div class="dr"><span class="k">facings</span><span class="v" id="exFacings">—</span></div>
+    <div class="dr"><span class="k">frame resolution</span><span class="v" id="exRes">—</span></div>
+    <div class="dr"><span class="k">pivot set</span><span class="v" id="exPivot">—</span></div>
+    <div class="dr"><span class="k">sockets detected</span><span class="v" id="exSockets">—</span></div>
+    <div class="dr"><span class="k">sheet rendered</span><span class="v" id="exSheet">—</span></div>
+  </div>
+  <div class="sgroup">
+    <div class="slabel">Embed Options</div>
+    <div class="toggle-row">
+      <span class="toggle-lbl">EMBED GLB IN FILE</span>
+      <div class="toggle on" id="tEmbedGlb" onclick="toggleOpt('embedGlb')"></div>
+    </div>
+    <div style="font-size:10px;color:var(--dim);line-height:1.6;margin-top:4px">
+      Embeds the source model so re-render works with no separate file.
+      Increases .jager size by ~35%.
+    </div>
+    <div class="toggle-row" style="margin-top:12px">
+      <span class="toggle-lbl">EMBED RENDER CONFIG</span>
+      <div class="toggle on" id="tEmbedCfg" onclick="toggleOpt('embedCfg')"></div>
+    </div>
+  </div>
+  <div class="sgroup">
+    <div class="slabel">Also Export</div>
+    <button class="ghost-btn" onclick="exportSheetPng()">EXPORT SHEET ONLY (.PNG)</button>
+  </div>
+</div>
+
+</div><!-- /pages -->
+
+<footer>
+  <button class="primary-btn" id="renderBtn"  onclick="doRender()">RENDER</button>
+  <button class="primary-btn" id="exportBtn"  onclick="doExport()">EXPORT .JAGER</button>
+  <div class="foot-msg" id="footMsg">Load a GLB model to begin.</div>
+</footer>
+
+<input type="file" id="fileGlb"   accept=".glb,.gltf"      onchange="onGlbPicked(event)">
+<input type="file" id="fileJager" accept=".jager,text/plain" onchange="onJagerPicked(event)">
+
+<script src="https://cdn.babylonjs.com/babylon.js"></script>
+<script src="https://cdn.babylonjs.com/loaders/babylonjs.loaders.min.js"></script>
+<script>
+// ════════════════════════════════════════════════════════════
+//  STATE
+// ════════════════════════════════════════════════════════════
+
+const S = {
+  glbDataUrl:  null,
+  glbFileName: null,
+
+  engine:     null,
+  scene:      null,
+  camera:     null,
+  pipeline:   null,
+  glowLayer:  null,
+  keyLight:   null,
+  rimLight:   null,
+  ambLight:   null,
+
+  meshes:      [],
+  socketBones: [],
+  animGroups:  [],
+
+  fx: { bloom:false, glow:false, sharpen:false, vignette:false, chroma:false, rim:true },
+  opts: { embedGlb:true, embedCfg:true },
+
+  sheetDataUrl:   null,
+  frameRes:       256,
+  facingCount:    8,
+  framesPerFacing:1,
+  socketData:     {},   // { "S": { sockets: { head_mount: {x,y,z_offset} } } }
+
+  pivot:       null,    // {x, y} in frame space
+  pzoom:       1,
+  pgrid:       true,
+
+  previewFrame: 0,
+  currentTab:   'load',
+};
+
+// ════════════════════════════════════════════════════════════
+//  HELPERS
+// ════════════════════════════════════════════════════════════
+
+const $ = id => document.getElementById(id);
+
+function facings() {
+  return $('facingOrder').value.split(',').map(s => s.trim()).filter(Boolean);
+}
+
+const SLOT_LAYERS = { legs:1, torso:2, left_arm:3, right_arm:4, head:5, weapon_main:6, weapon_aux:7, custom:0 };
+
+function compName() {
+  const s = $('componentSlot').value;
+  return s === 'custom' ? ($('customName').value.trim() || 'unnamed') : s;
+}
+
+function onSlotChange() {
+  const s = $('componentSlot').value;
+  $('customWrap').style.display = s === 'custom' ? 'block' : 'none';
+  $('drawLayer').value = SLOT_LAYERS[s] ?? 0;
+}
+
+function updateFacingTags() {
+  $('facingTags').innerHTML = facings()
+    .map((f,i) => `<span class="facing-tag">${i}:${f}</span>`).join('');
+}
+
+function setStatus(type, txt) {
+  $('statusDot').className  = 'dot ' + type;
+  $('statusTxt').textContent = txt;
+}
+
+function msg(type, txt) {
+  const el = $('footMsg');
+  el.className   = 'foot-msg' + (type ? ' ' + type : '');
+  el.textContent = txt;
+}
+
+function delay(ms) { return new Promise(r => setTimeout(r, ms)); }
+
+// ════════════════════════════════════════════════════════════
+//  TABS
+// ════════════════════════════════════════════════════════════
+
+function showTab(id) {
+  if (S.currentTab === 'render' && S.engine) {
+    S.engine.stopRenderLoop();
+  }
+  S.currentTab = id;
+
+  document.querySelectorAll('.tab').forEach(t =>
+    t.classList.toggle('active', t.dataset.tab === id));
+  document.querySelectorAll('.page').forEach(p =>
+    p.classList.toggle('active', p.id === 'page-' + id));
+
+  $('renderBtn').classList.toggle('visible', id === 'render');
+  $('exportBtn').classList.toggle('visible', id === 'export');
+
+  if (id === 'render' && S.engine && S.scene) {
+    S.engine.resize();
+    S.engine.runRenderLoop(() => S.scene.render());
+  }
+  if (id === 'pivot')   requestAnimationFrame(pfitView);
+  if (id === 'preview') { renderPreviewFrame(); updatePreviewPanel(); }
+  if (id === 'export')  updateExportPanel();
+}
+
+// ════════════════════════════════════════════════════════════
+//  FILE LOADING
+// ════════════════════════════════════════════════════════════
+
+function triggerGlb()   { $('fileGlb').click(); }
+function triggerJager() { $('fileJager').click(); }
+
+function onGlbPicked(e) {
+  const f = e.target.files[0]; if (!f) return; e.target.value = '';
+  setStatus('busy', 'LOADING...');
+  msg('', 'Reading file…');
+  const reader = new FileReader();
+  reader.onload = ev => {
+    S.glbDataUrl  = ev.target.result;
+    S.glbFileName = f.name;
+    S.pivot = null; S.sheetDataUrl = null; S.socketData = {};
+    _pivotImg = null;
+    initBabylon();
+  };
+  reader.readAsDataURL(f);
+}
+
+function onJagerPicked(e) {
+  const f = e.target.files[0]; if (!f) return; e.target.value = '';
+  const reader = new FileReader();
+  reader.onload = ev => {
+    try {
+      const j = JSON.parse(ev.target.result);
+      restoreFromJager(j);
+    } catch { msg('err', 'Invalid .jager file.'); }
+  };
+  reader.readAsText(f);
+}
+
+function restoreFromJager(j) {
+  // Component
+  if (j.component) {
+    const opts = Array.from($('componentSlot').options).map(o => o.value);
+    if (opts.includes(j.component)) {
+      $('componentSlot').value = j.component;
+    } else {
+      $('componentSlot').value = 'custom';
+      $('customName').value = j.component;
+    }
+    onSlotChange();
+  }
+
+  // Render config
+  if (j.render_config) restoreRenderConfig(j.render_config);
+
+  // Sheet + pivot
+  if (j.sheet)   { S.sheetDataUrl = j.sheet; _pivotImg = null; }
+  if (j.facing_defaults?.pivot) S.pivot = { ...j.facing_defaults.pivot };
+  if (j.facings) S.facingCount = j.facings;
+  if (j.frames_per_facing) S.framesPerFacing = j.frames_per_facing;
+  if (j.frame_width) S.frameRes = j.frame_width;
+  if (j.facing_data) S.socketData = j.facing_data;
+
+  // GLB
+  if (j.glb) {
+    S.glbDataUrl = j.glb; S.glbFileName = j.component + '.jager';
+    initBabylon();
+  } else {
+    msg('ok', 'Settings restored. Load GLB to re-render.');
+    setStatus('ready', j.component || 'restored');
+    $('loadSettings').style.display = 'block';
+    if (S.sheetDataUrl) {
+      $('infoGrid').classList.add('visible');
+      updateLoadCard();
+    }
+  }
+}
+
+// ════════════════════════════════════════════════════════════
+//  BABYLON — INIT
+// ════════════════════════════════════════════════════════════
+
+async function initBabylon() {
+  const canvas = $('babylonCanvas');
+
+  if (S.engine) { S.engine.dispose(); S.engine = null; S.scene = null; }
+
+  S.engine = new BABYLON.Engine(canvas, true, {
+    preserveDrawingBuffer: true,
+    stencil: true,
+    alpha:   true,
+  });
+
+  S.scene = new BABYLON.Scene(S.engine);
+  S.scene.clearColor = new BABYLON.Color4(0, 0, 0, 0);
+
+  S.camera = new BABYLON.ArcRotateCamera('cam',
+    Math.PI,        // alpha — south facing
+    Math.PI / 3,    // beta  — 60° isometric elevation
+    10,
+    BABYLON.Vector3.Zero(), S.scene);
+  S.camera.lowerBetaLimit   = 0.1;
+  S.camera.upperBetaLimit   = Math.PI / 2;
+  S.camera.lowerRadiusLimit = 0.5;
+  S.camera.upperRadiusLimit = 200;
+  S.camera.attachControl(canvas, true);
+
+  setupLighting();
+  setupPostProcessing();
+
+  try {
+    const result = await BABYLON.SceneLoader.ImportMeshAsync(
+      '', '', S.glbDataUrl, S.scene, null, '.glb'
+    );
+
+    S.meshes     = result.meshes;
+    S.animGroups = result.animationGroups;
+
+    // Find socket bones (prefix: "socket_")
+    S.socketBones = [];
+    result.skeletons.forEach(skel => {
+      skel.bones.forEach(b => {
+        if (b.name.startsWith('socket_')) S.socketBones.push(b);
+      });
+    });
+
+    fitCameraToModel();
+    populateAnimGroups();
+    updateLoadCard();
+
+    $('infoGrid').classList.add('visible');
+    $('loadSettings').style.display = 'block';
+
+    setStatus('ready', S.glbFileName);
+    msg('ok', `${S.meshes.length} meshes · ${S.socketBones.length} sockets detected`);
+
+    // Switch to render tab and start loop
+    showTab('render');
+    S.engine.runRenderLoop(() => S.scene.render());
+    S.engine.resize();
+
+  } catch (err) {
+    setStatus('', 'ERROR');
+    msg('err', 'Load failed: ' + (err.message || err));
+    console.error(err);
+  }
+}
+
+function updateLoadCard() {
+  $('iComp').textContent    = compName();
+  $('iAnims').textContent   = S.animGroups.length;
+  $('iMeshes').textContent  = S.meshes.length;
+  $('iSockets').textContent = S.socketBones.length;
+}
+
+// ════════════════════════════════════════════════════════════
+//  BABYLON — LIGHTING
+// ════════════════════════════════════════════════════════════
+
+function setupLighting() {
+  // Hemisphere ambient
+  S.ambLight = new BABYLON.HemisphericLight('amb',
+    new BABYLON.Vector3(0, 1, 0), S.scene);
+  S.ambLight.intensity    = 0.3;
+  S.ambLight.diffuse      = BABYLON.Color3.White();
+  S.ambLight.groundColor  = new BABYLON.Color3(0.08, 0.08, 0.12);
+
+  // Key directional
+  buildKeyLight();
+
+  // Rim directional (cool blue backlight)
+  S.rimLight = new BABYLON.DirectionalLight('rim',
+    new BABYLON.Vector3(-0.5, -0.5, 1).normalize(), S.scene);
+  S.rimLight.intensity = 0.4;
+  S.rimLight.diffuse   = new BABYLON.Color3(0.5, 0.6, 1.0);
+}
+
+function buildKeyLight() {
+  if (S.keyLight) S.keyLight.dispose();
+  const elev = parseFloat($('sKeyElev').value) * Math.PI / 180;
+  const az   = parseFloat($('sKeyAz').value)   * Math.PI / 180;
+  const dir  = new BABYLON.Vector3(
+    -Math.cos(elev) * Math.sin(az),
+    -Math.sin(elev),
+    -Math.cos(elev) * Math.cos(az)
+  ).normalize();
+  S.keyLight = new BABYLON.DirectionalLight('key', dir, S.scene);
+  S.keyLight.intensity = parseFloat($('sKeyInt').value);
+}
+
+function onLightChange(el, key) {
+  const v = parseFloat(el.value);
+  const deg = ['keyElev','keyAz'].includes(key);
+  const lbl = { ambient:'vAmbient', keyInt:'vKeyInt', keyElev:'vKeyElev', keyAz:'vKeyAz', rimInt:'vRimInt' };
+  if (lbl[key]) $(lbl[key]).textContent = deg ? `${Math.round(v)}°` : v.toFixed(2);
+
+  if (!S.scene) return;
+  if (key === 'ambient' && S.ambLight) S.ambLight.intensity = v;
+  if ((key === 'keyInt' || key === 'keyElev' || key === 'keyAz') && S.keyLight) buildKeyLight();
+  if (key === 'rimInt'  && S.rimLight) S.rimLight.intensity = v;
+}
+
+// ════════════════════════════════════════════════════════════
+//  BABYLON — POST-PROCESS
+// ════════════════════════════════════════════════════════════
+
+function setupPostProcessing() {
+  S.pipeline = new BABYLON.DefaultRenderingPipeline('pp', true, S.scene, [S.camera]);
+  S.pipeline.bloomEnabled              = false;
+  S.pipeline.bloomThreshold            = 0.8;
+  S.pipeline.bloomWeight               = 0.4;
+  S.pipeline.bloomKernel               = 64;
+  S.pipeline.sharpenEnabled            = false;
+  S.pipeline.sharpen.edgeAmount        = 0.3;
+  S.pipeline.imageProcessingEnabled    = true;
+  S.pipeline.imageProcessing.vignetteEnabled = false;
+  S.pipeline.imageProcessing.vignetteWeight  = 5;
+  S.pipeline.chromaticAberrationEnabled      = false;
+
+  S.glowLayer = new BABYLON.GlowLayer('glow', S.scene);
+  S.glowLayer.intensity  = 0.6;
+  S.glowLayer.isEnabled  = false;
+}
+
+function onPPChange(el, key) {
+  const v = parseFloat(el.value);
+  const lbls = {
+    bloomThreshold:'vBloomT', bloomWeight:'vBloomW',
+    glowIntensity:'vGlowI', sharpenAmount:'vSharpen',
+    vignetteWeight:'vVigW', chromaAmount:'vChroma',
+  };
+  if (lbls[key]) $(lbls[key]).textContent = v.toFixed(2);
+  if (!S.pipeline) return;
+  if (key === 'bloomThreshold') S.pipeline.bloomThreshold = v;
+  if (key === 'bloomWeight')    S.pipeline.bloomWeight    = v;
+  if (key === 'glowIntensity' && S.glowLayer) S.glowLayer.intensity = v;
+  if (key === 'sharpenAmount')  S.pipeline.sharpen.edgeAmount = v;
+  if (key === 'vignetteWeight') S.pipeline.imageProcessing.vignetteWeight = v;
+  if (key === 'chromaAmount' && S.pipeline.chromaticAberrationEnabled)
+    S.pipeline.chromaticAberration.aberrationAmount = v;
+}
+
+const FX_MAP = {
+  bloom:    { toggle:'tBloom',   sub:'bloomSub',    on: () => S.pipeline && (S.pipeline.bloomEnabled = true),             off: () => S.pipeline && (S.pipeline.bloomEnabled = false) },
+  glow:     { toggle:'tGlow',    sub:'glowSub',     on: () => S.glowLayer && (S.glowLayer.isEnabled = true),              off: () => S.glowLayer && (S.glowLayer.isEnabled = false) },
+  sharpen:  { toggle:'tSharpen', sub:'sharpenSub',  on: () => S.pipeline && (S.pipeline.sharpenEnabled = true),           off: () => S.pipeline && (S.pipeline.sharpenEnabled = false) },
+  vignette: { toggle:'tVignette',sub:'vignetteSub', on: () => S.pipeline && (S.pipeline.imageProcessing.vignetteEnabled = true),  off: () => S.pipeline && (S.pipeline.imageProcessing.vignetteEnabled = false) },
+  chroma:   { toggle:'tChroma',  sub:'chromaSub',   on: () => S.pipeline && (S.pipeline.chromaticAberrationEnabled = true),       off: () => S.pipeline && (S.pipeline.chromaticAberrationEnabled = false) },
+  rim:      { toggle:'tRim',     sub:'rimSub',      on: () => S.rimLight && S.rimLight.setEnabled(true),                  off: () => S.rimLight && S.rimLight.setEnabled(false) },
+};
+
+function toggleFx(key) {
+  S.fx[key] = !S.fx[key];
+  const def = FX_MAP[key]; if (!def) return;
+  $(def.toggle).classList.toggle('on', S.fx[key]);
+  if (def.sub) $(def.sub).classList.toggle('off', !S.fx[key]);
+  S.fx[key] ? def.on() : def.off();
+}
+
+function toggleOpt(key) {
+  S.opts[key] = !S.opts[key];
+  const id = key === 'embedGlb' ? 'tEmbedGlb' : 'tEmbedCfg';
+  $(id).classList.toggle('on', S.opts[key]);
+}
+
+// ════════════════════════════════════════════════════════════
+//  BABYLON — UTILS
+// ════════════════════════════════════════════════════════════
+
+function fitCameraToModel() {
+  if (!S.meshes.length) return;
+  let min = new BABYLON.Vector3( 1e9,  1e9,  1e9);
+  let max = new BABYLON.Vector3(-1e9, -1e9, -1e9);
+  S.meshes.forEach(m => {
+    if (!m.getBoundingInfo) return;
+    try {
+      const bi = m.getBoundingInfo();
+      if (!bi) return;
+      min = BABYLON.Vector3.Minimize(min, bi.boundingBox.minimumWorld);
+      max = BABYLON.Vector3.Maximize(max, bi.boundingBox.maximumWorld);
+    } catch {}
+  });
+  const size   = BABYLON.Vector3.Distance(min, max);
+  const center = BABYLON.Vector3.Lerp(min, max, 0.5);
+  S.camera.target           = center;
+  S.camera.radius           = size * 1.5;
+  S.camera.lowerRadiusLimit = size * 0.3;
+  S.camera.upperRadiusLimit = size * 8;
+}
+
+function populateAnimGroups() {
+  const sel = $('animSelect');
+  sel.innerHTML = '<option value="">none — static render</option>';
+  S.animGroups.forEach((ag, i) => {
+    const o = document.createElement('option');
+    o.value = i; o.textContent = ag.name || `Animation ${i}`;
+    sel.appendChild(o);
+  });
+}
+
+// ════════════════════════════════════════════════════════════
+//  RENDER PIPELINE
+// ════════════════════════════════════════════════════════════
+
+// Facing → camera alpha (radians). Covers the standard 8-facing iso layout.
+const FACING_ALPHA = {
+  'SW': Math.PI * 1.25, 'S': Math.PI,       'SE': Math.PI * 0.75,
+  'E':  Math.PI * 0.5,  'NE': Math.PI * 0.25,'N': 0,
+  'NW': Math.PI * 1.75, 'W': Math.PI * 1.5,
+};
+
+async function doRender() {
+  if (!S.scene || !S.engine) { msg('err', 'No model loaded.'); return; }
+
+  const facing  = facings();
+  const frameRes = parseInt($('resolution').value);
+  S.frameRes         = frameRes;
+  S.facingCount      = facing.length;
+  S.framesPerFacing  = 1;   // v1 static
+  S.socketData       = {};
+  _pivotImg          = null;
+
+  $('renderBtn').disabled = true;
+  $('progressWrap').classList.add('visible');
+  setStatus('busy', 'RENDERING…');
+  S.camera.detachControl();
+
+  // Resize engine to exact capture resolution
+  S.engine.stopRenderLoop();
+  S.engine.setSize(frameRes, frameRes);
+  await delay(120); // let pipeline resize
+
+  const captures = [];
+
+  try {
+    for (let i = 0; i < facing.length; i++) {
+      const facingName = facing[i];
+      const alpha = FACING_ALPHA[facingName] ?? (i * Math.PI * 2 / facing.length);
+      S.camera.alpha = alpha;
+
+      // Settle post-processing — render multiple frames
+      for (let r = 0; r < 4; r++) S.scene.render();
+
+      // Extract socket positions at this facing and resolution
+      extractSockets(facingName, frameRes);
+
+      // Capture from canvas buffer
+      const canvas = $('babylonCanvas');
+      const dst    = document.createElement('canvas');
+      dst.width = dst.height = frameRes;
+      dst.getContext('2d').drawImage(canvas, 0, 0, canvas.width, canvas.height, 0, 0, frameRes, frameRes);
+      captures.push({ idx: i, facingName, dataUrl: dst.toDataURL('image/png') });
+
+      setProgress((i + 1) / facing.length);
+      msg('', `Capturing ${facingName} (${i+1}/${facing.length})…`);
+      await delay(30);
+    }
+
+    msg('', 'Assembling sheet…');
+    S.sheetDataUrl = await assembleSheet(captures, frameRes);
+    setStatus('ready', 'RENDERED');
+    msg('ok', `${facing.length} facings × ${frameRes}px — ready`);
+    showTab('pivot');
+
+  } catch (err) {
+    setStatus('ready', 'RENDER ERROR');
+    msg('err', err.message || String(err));
+    console.error(err);
+  } finally {
+    S.engine.setSize(
+      $('babylonCanvas').clientWidth  || 320,
+      $('babylonCanvas').clientHeight || 320
+    );
+    S.engine.runRenderLoop(() => S.scene.render());
+    S.engine.resize();
+    S.camera.attachControl($('babylonCanvas'), true);
+    $('renderBtn').disabled = false;
+    $('progressWrap').classList.remove('visible');
+    setProgress(0);
+  }
+}
+
+function extractSockets(facingName, frameRes) {
+  if (!S.socketBones.length || !S.scene) return;
+
+  const engW = S.engine.getRenderWidth();
+  const engH = S.engine.getRenderHeight();
+  const vp   = S.camera.viewport.toGlobal(engW, engH);
+
+  const sockets = {};
+  S.socketBones.forEach(bone => {
+    const name = bone.name.replace('socket_', '');
+    try {
+      const wm  = bone.getWorldMatrix();
+      const wp  = BABYLON.Vector3.TransformCoordinates(BABYLON.Vector3.Zero(), wm);
+      const sp  = BABYLON.Vector3.Project(wp, BABYLON.Matrix.Identity(), S.scene.getTransformMatrix(), vp);
+
+      // Depth relative to camera target — determines z_offset
+      const toCamera = wp.subtract(S.camera.target);
+      const camFwd   = S.camera.getForwardRay().direction;
+      const depth    = BABYLON.Vector3.Dot(toCamera, camFwd);
+
+      sockets[name] = {
+        x:        Math.round(sp.x * (frameRes / engW)),
+        y:        Math.round(sp.y * (frameRes / engH)),
+        z_offset: depth < 0 ? 1 : -1,
+      };
+    } catch {}
+  });
+
+  if (Object.keys(sockets).length) {
+    S.socketData[facingName] = { sockets };
+  }
+}
+
+async function assembleSheet(captures, frameRes) {
+  const canvas = document.createElement('canvas');
+  canvas.width  = frameRes * captures.length;
+  canvas.height = frameRes;
+  const ctx = canvas.getContext('2d');
+  for (const cap of captures) {
+    const img = new Image();
+    await new Promise(res => { img.onload = res; img.src = cap.dataUrl; });
+    ctx.drawImage(img, cap.idx * frameRes, 0, frameRes, frameRes);
+  }
+  return canvas.toDataURL('image/png');
+}
+
+function setProgress(pct) {
+  $('progressBar').style.width = `${Math.round(pct * 100)}%`;
+}
+
+// ════════════════════════════════════════════════════════════
+//  PIVOT TAB
+// ════════════════════════════════════════════════════════════
+
+let _pivotImg = null;
+
+function pfitView() {
+  if (!S.sheetDataUrl) { msg('', 'Render the sheet first — RENDER tab.'); return; }
+  loadPivotImg(() => {
+    const el  = $('pivotScroll');
+    const img = _pivotImg;
+    if (!img || !el.clientWidth) return;
+    S.pzoom = Math.max(Math.min((el.clientWidth - 4) / img.width, (el.clientHeight - 4) / img.height, 8), 0.05);
+    updatePzoomLbl();
+    drawPivotCanvas();
+  });
+}
+
+function loadPivotImg(cb) {
+  if (_pivotImg && _pivotImg._src === S.sheetDataUrl) { cb(); return; }
+  const img  = new Image();
+  img.onload = () => { img._src = S.sheetDataUrl; _pivotImg = img; cb(); };
+  img.src    = S.sheetDataUrl;
+}
+
+function drawPivotCanvas() {
+  const img = _pivotImg; if (!img) return;
+  const z   = S.pzoom;
+  const cw  = Math.round(img.width  * z);
+  const ch  = Math.round(img.height * z);
+  const c   = $('pivotCanvas');
+  c.width   = cw; c.height = ch;
+  const ctx = c.getContext('2d');
+
+  // Checkerboard
+  const cs = Math.max(6, Math.round(12 * z));
+  for (let r = 0; r * cs < ch; r++)
+    for (let c2 = 0; c2 * cs < cw; c2++) {
+      ctx.fillStyle = (r + c2) % 2 === 0 ? '#1a1a1a' : '#111';
+      ctx.fillRect(c2 * cs, r * cs, cs, cs);
+    }
+
+  ctx.imageSmoothingEnabled = false;
+  ctx.drawImage(img, 0, 0, cw, ch);
+
+  // Grid
+  if (S.pgrid) {
+    const fw = (img.width  / S.facingCount)       * z;
+    const fh = (img.height / S.framesPerFacing)   * z;
+    ctx.strokeStyle = 'rgba(245,158,11,0.5)'; ctx.lineWidth = 1;
+    for (let i = 1; i < S.facingCount;      i++) { const x = Math.round(i*fw)+.5; ctx.beginPath(); ctx.moveTo(x,0); ctx.lineTo(x,ch); ctx.stroke(); }
+    for (let i = 1; i < S.framesPerFacing;  i++) { const y = Math.round(i*fh)+.5; ctx.beginPath(); ctx.moveTo(0,y); ctx.lineTo(cw,y); ctx.stroke(); }
+    ctx.strokeStyle = 'rgba(245,158,11,0.15)';
+    ctx.strokeRect(.5, .5, cw-1, ch-1);
+  }
+
+  // Pivot crosshairs
+  if (S.pivot) {
+    const fw  = (img.width  / S.facingCount)     * z;
+    const fh  = (img.height / S.framesPerFacing) * z;
+    const px  = S.pivot.x * z;
+    const py  = S.pivot.y * z;
+    const arm = 10;
+    ctx.strokeStyle = '#f59e0b'; ctx.lineWidth = 1.5;
+    for (let r = 0; r < S.framesPerFacing; r++) {
+      for (let c2 = 0; c2 < S.facingCount; c2++) {
+        const cx = c2*fw + px, cy = r*fh + py;
+        ctx.beginPath(); ctx.moveTo(cx-arm,cy); ctx.lineTo(cx+arm,cy); ctx.moveTo(cx,cy-arm); ctx.lineTo(cx,cy+arm); ctx.stroke();
+        ctx.beginPath(); ctx.arc(cx,cy,3.5,0,Math.PI*2); ctx.stroke();
+      }
+    }
+    $('pivotCoord').textContent = `pivot ${S.pivot.x}, ${S.pivot.y}`;
+  }
+}
+
+// Touch-safe tap
+let _ptx=0, _pty=0, _pmoved=false;
+function initPivotHandlers() {
+  const c = $('pivotCanvas');
+  c.addEventListener('touchstart', e => { _ptx=e.touches[0].clientX; _pty=e.touches[0].clientY; _pmoved=false; }, { passive:true });
+  c.addEventListener('touchmove',  e => { if (Math.abs(e.touches[0].clientX-_ptx)>6 || Math.abs(e.touches[0].clientY-_pty)>6) _pmoved=true; }, { passive:true });
+  c.addEventListener('touchend',   e => {
+    if (_pmoved || !S.sheetDataUrl) return;
+    e.preventDefault();
+    const t=e.changedTouches[0]; const r=c.getBoundingClientRect();
+    setPivotXY((t.clientX-r.left)/S.pzoom, (t.clientY-r.top)/S.pzoom);
+  });
+  c.addEventListener('click', e => {
+    if (!S.sheetDataUrl) return;
+    const r=c.getBoundingClientRect();
+    setPivotXY((e.clientX-r.left)/S.pzoom, (e.clientY-r.top)/S.pzoom);
+  });
+}
+
+function setPivotXY(sx, sy) {
+  const img = _pivotImg; if (!img) return;
+  const fw = img.width  / S.facingCount;
+  const fh = img.height / S.framesPerFacing;
+  S.pivot = { x: Math.round(sx % fw), y: Math.round(sy % fh) };
+  $('pivotHint').style.display = 'none';
+  drawPivotCanvas();
+  msg('ok', `Pivot — x:${S.pivot.x}  y:${S.pivot.y}`);
+}
+
+function pzoomIn()  { S.pzoom = Math.min(S.pzoom*1.5, 20);   updatePzoomLbl(); drawPivotCanvas(); }
+function pzoomOut() { S.pzoom = Math.max(S.pzoom/1.5, 0.05); updatePzoomLbl(); drawPivotCanvas(); }
+function updatePzoomLbl() { $('pzoomLbl').textContent = `${Math.round(S.pzoom*100)}%`; }
+function togglePGrid() { S.pgrid=!S.pgrid; $('btnGrid').classList.toggle('on',S.pgrid); drawPivotCanvas(); }
+
+// ════════════════════════════════════════════════════════════
+//  PREVIEW TAB
+// ════════════════════════════════════════════════════════════
+
+function renderPreviewFrame() {
+  if (!S.sheetDataUrl) return;
+  loadPivotImg(() => {
+    const img  = _pivotImg; if (!img) return;
+    const fw   = Math.floor(img.width  / S.facingCount);
+    const fh   = Math.floor(img.height / S.framesPerFacing);
+    const total= S.facingCount * S.framesPerFacing;
+    const size = 300;
+
+    S.previewFrame = Math.min(S.previewFrame, total-1);
+    const fcol = S.previewFrame % S.facingCount;
+    const frow = Math.floor(S.previewFrame / S.facingCount);
+
+    const c = $('previewCanvas');
+    c.width = c.height = size;
+    const ctx = c.getContext('2d');
+    ctx.clearRect(0,0,size,size);
+
+    const scale = Math.min(size/fw, size/fh, 4);
+    const dw=fw*scale, dh=fh*scale;
+    const dx=(size-dw)/2, dy=(size-dh)/2;
+    ctx.imageSmoothingEnabled=false;
+    ctx.drawImage(img, fcol*fw, frow*fh, fw, fh, dx, dy, dw, dh);
+
+    // Pivot
+    if (S.pivot) {
+      const px=dx+S.pivot.x*scale, py=dy+S.pivot.y*scale, arm=13;
+      ctx.strokeStyle='#f59e0b'; ctx.lineWidth=1.5;
+      ctx.beginPath(); ctx.moveTo(px-arm,py); ctx.lineTo(px+arm,py); ctx.moveTo(px,py-arm); ctx.lineTo(px,py+arm); ctx.stroke();
+      ctx.beginPath(); ctx.arc(px,py,4,0,Math.PI*2); ctx.stroke();
+    }
+
+    // Sockets
+    const facingName = facings()[fcol];
+    const sd = S.socketData[facingName]?.sockets;
+    if (sd) {
+      ctx.strokeStyle='#3b82f6'; ctx.fillStyle='rgba(59,130,246,0.25)'; ctx.lineWidth=1.5;
+      Object.entries(sd).forEach(([nm, sock]) => {
+        const sx=dx+sock.x*scale, sy=dy+sock.y*scale;
+        ctx.beginPath(); ctx.arc(sx,sy,5,0,Math.PI*2); ctx.fill(); ctx.stroke();
+        ctx.fillStyle='#3b82f6'; ctx.font='9px Share Tech Mono';
+        ctx.fillText(nm, sx+7, sy+3);
+        ctx.fillStyle='rgba(59,130,246,0.25)';
+      });
+    }
+
+    $('frameLbl').textContent = facings()[fcol] ?? String(fcol);
+  });
+}
+
+function updatePreviewPanel() {
+  $('pvComp').textContent    = compName();
+  $('pvSize').textContent    = S.sheetDataUrl ? `${S.frameRes} × ${S.frameRes}` : '—';
+  $('pvPivot').textContent   = S.pivot ? `${S.pivot.x}, ${S.pivot.y}` : 'not set';
+  const sdKeys = Object.values(S.socketData)[0]?.sockets;
+  $('pvSockets').textContent = sdKeys ? `${Object.keys(sdKeys).length} per facing` : '0';
+  if (S.sheetDataUrl) {
+    $('pvFileSize').textContent = `~${(S.sheetDataUrl.length*.75/1024).toFixed(0)} KB (sheet)`;
+  }
+}
+
+function stepFrame(dir) {
+  const total = S.facingCount * S.framesPerFacing;
+  S.previewFrame = ((S.previewFrame+dir)+total)%total;
+  renderPreviewFrame();
+}
+
+// ════════════════════════════════════════════════════════════
+//  EXPORT
+// ════════════════════════════════════════════════════════════
+
+function updateExportPanel() {
+  const f = facings();
+  $('exComp').textContent    = compName();
+  $('exFacings').textContent = `${f.length} (${f.join(', ')})`;
+  $('exRes').textContent     = S.frameRes ? `${S.frameRes} × ${S.frameRes}` : '—';
+  $('exPivot').textContent   = S.pivot ? `${S.pivot.x}, ${S.pivot.y}` : '—';
+
+  const sdKeys = Object.values(S.socketData)[0]?.sockets;
+  $('exSockets').textContent = sdKeys ? Object.keys(sdKeys).length : '0';
+
+  const sheetOk = !!S.sheetDataUrl;
+  $('exSheet').textContent   = sheetOk ? 'YES' : 'NO';
+  $('exSheet').className     = 'v ' + (sheetOk ? 'ok' : 'bad');
+}
+
+function doExport() {
+  if (!S.sheetDataUrl) { msg('err', 'Render sheet first — RENDER tab.'); return; }
+  if (!S.pivot)        { msg('err', 'Set pivot first — PIVOT tab.');     return; }
+
+  const f    = facings();
+  const name = compName();
+
+  // Build facing_data (only entries with sockets or custom overrides)
+  const facingData = {};
+  f.forEach(fn => {
+    if (S.socketData[fn]) facingData[fn] = { ...S.socketData[fn] };
+  });
+
+  const jager = {
+    format:            'jager',
+    version:           3,
+    engine:            'Spritebox',
+    component:         name,
+    facings:           f.length,
+    facing_order:      f,
+    frames_per_facing: S.framesPerFacing,
+    frame_width:       S.frameRes,
+    frame_height:      S.frameRes,
+    facing_defaults: {
+      pivot:      S.pivot,
+      draw_layer: parseInt($('drawLayer').value) || 0,
+    },
+    facing_data: facingData,
+    sheet:       S.sheetDataUrl,
+  };
+
+  if (S.opts.embedCfg) jager.render_config = buildRenderConfig();
+  if (S.opts.embedGlb && S.glbDataUrl) jager.glb = S.glbDataUrl;
+
+  download(`${name}.jager`, JSON.stringify(jager, null, 2));
+  msg('ok', `Exported ${name}.jager`);
+}
+
+function exportSheetPng() {
+  if (!S.sheetDataUrl) { msg('err', 'No sheet rendered.'); return; }
+  download(`${compName()}_sheet.png`, S.sheetDataUrl, true);
+  msg('ok', 'Sheet exported as PNG.');
+}
+
+function download(filename, data, isDataUrl=false) {
+  const a = document.createElement('a');
+  if (isDataUrl) {
+    a.href = data;
+  } else {
+    const blob = new Blob([data], { type:'application/octet-stream' });
+    a.href = URL.createObjectURL(blob);
+  }
+  a.download = filename;
+  document.body.appendChild(a); a.click(); document.body.removeChild(a);
+  if (!isDataUrl) URL.revokeObjectURL(a.href);
+}
+
+function buildRenderConfig() {
+  return {
+    resolution: S.frameRes,
+    lighting: {
+      ambient:       parseFloat($('sAmbient').value),
+      key_intensity: parseFloat($('sKeyInt').value),
+      key_elevation: parseFloat($('sKeyElev').value),
+      key_azimuth:   parseFloat($('sKeyAz').value),
+      rim:           S.fx.rim,
+      rim_intensity: parseFloat($('sRimInt').value),
+    },
+    post_process: {
+      bloom:    { enabled:S.fx.bloom,    threshold:parseFloat($('sBloomT').value), weight:parseFloat($('sBloomW').value) },
+      glow:     { enabled:S.fx.glow,     intensity:parseFloat($('sGlowI').value) },
+      sharpen:  { enabled:S.fx.sharpen,  amount:parseFloat($('sSharpen').value) },
+      vignette: { enabled:S.fx.vignette, weight:parseFloat($('sVigW').value) },
+      chroma:   { enabled:S.fx.chroma,   amount:parseFloat($('sChroma').value) },
+    },
+  };
+}
+
+function restoreRenderConfig(cfg) {
+  const l = cfg.lighting || {};
+  const set = (id, v, valId, fmt) => { if (v===undefined) return; $(id).value=v; if(valId) $(valId).textContent=fmt?fmt(v):v.toFixed(2); };
+  set('sAmbient',  l.ambient,       'vAmbient');
+  set('sKeyInt',   l.key_intensity, 'vKeyInt');
+  set('sKeyElev',  l.key_elevation, 'vKeyElev', v=>`${Math.round(v)}°`);
+  set('sKeyAz',    l.key_azimuth,   'vKeyAz',   v=>`${Math.round(v)}°`);
+  set('sRimInt',   l.rim_intensity, 'vRimInt');
+
+  const pp = cfg.post_process || {};
+  ['bloom','glow','sharpen','vignette','chroma'].forEach(k => {
+    if (pp[k]?.enabled && !S.fx[k]) toggleFx(k);
+  });
+  if (l.rim && !S.fx.rim) toggleFx('rim');
+}
+
+// ════════════════════════════════════════════════════════════
+//  RESIZE
+// ════════════════════════════════════════════════════════════
+
+window.addEventListener('resize', () => {
+  if (S.engine && S.currentTab === 'render') S.engine.resize();
+});
+
+// ════════════════════════════════════════════════════════════
+//  INIT
+// ════════════════════════════════════════════════════════════
+
+initPivotHandlers();
+updateFacingTags();
+</script>
+</body>
+</html>
